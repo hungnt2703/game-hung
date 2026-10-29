@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Bắt Quả Vui Nhộn</title>
+<style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    text-align: center;
+    background-color: #87ceeb;
+  }
+  #gameArea {
+    position: relative;
+    width: 400px;
+    height: 500px;
+    margin: auto;
+    background: linear-gradient(#87ceeb, #98fb98);
+    border: 3px solid #333;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+  .fruit {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-size: cover;
+  }
+  #basket {
+    position: absolute;
+    bottom: 0;
+    width: 80px;
+    height: 40px;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/4/4b/Basket_icon.png');
+    background-size: cover;
+  }
+  h1 {
+    color: #ff4500;
+    text-shadow: 2px 2px #fff;
+  }
+  p {
+    font-size: 18px;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<h1>🍎🍌🍊🍓 Bắt Quả Vui Nhộn 🍎🍌🍊🍓</h1>
+<div id="gameArea">
+  <div id="basket"></div>
+</div>
+<p>Điểm: <span id="score">0</span></p>
+
+<audio id="catchSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+<audio id="bgMusic" src="https://www.bensound.com/bensound-music/bensound-funkyelement.mp3" loop></audio>
+
+<script>
+const gameArea = document.getElementById('gameArea');
+const basket = document.getElementById('basket');
+const scoreDisplay = document.getElementById('score');
+const catchSound = document.getElementById('catchSound');
+const bgMusic = document.getElementById('bgMusic');
+let score = 0;
+let speed = 5;
+
+// Danh sách quả
+const fruits = [
+  {img: 'https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg', points: 1},
+  {img: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg', points: 2},
+  {img: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Orange-Fruit.jpg', points: 3},
+  {img: 'https://upload.wikimedia.org/wikipedia/commons/2/29/Strawberry.jpg', points: 4}
+];
+
+// Di chuyển giỏ theo chuột
+gameArea.addEventListener('mousemove', e => {
+  moveBasket(e.clientX);
+});
+
+// Di chuyển giỏ theo cảm ứng
+gameArea.addEventListener('touchmove', e => {
+  moveBasket(e.touches[0].clientX);
+});
+
+function moveBasket(clientX) {
+  const rect = gameArea.getBoundingClientRect();
+  let x = clientX - rect.left - basket.offsetWidth / 2;
+  basket.style.left = Math.max(0, Math.min(x, gameArea.offsetWidth - basket.offsetWidth)) + 'px';
+}
+
+// Tạo quả rơi
+function createFruit() {
+  const fruitData = fruits[Math.floor(Math.random() * fruits.length)];
+  const fruit = document.createElement('div');
+  fruit.classList.add('fruit');
+  fruit.style.backgroundImage = `url('${fruitData.img}')`;
+  fruit.style.left = Math.random() * (gameArea.offsetWidth - 40) + 'px';
+  fruit.style.top = '0px';
+  gameArea.appendChild(fruit);
+
+  let fallInterval = setInterval(() => {
+    fruit.style.top = parseInt(fruit.style.top) + speed + 'px';
+    if (parseInt(fruit.style.top) >= gameArea.offsetHeight - basket.offsetHeight) {
+      const basketLeft = parseInt(basket.style.left || 0);
+      const fruitLeft = parseInt(fruit.style.left);
+      if (fruit
